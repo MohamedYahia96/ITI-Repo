@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="/css/all.min.css" />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css"
+  />
+  <link rel="stylesheet" href="css/style.css"/>
+  <title>Home | Page</title>
+  
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container px-4 px-lg-5">
+      <a class="navbar-brand" href="#!" style="color: #000;">Start Shop</a>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4" id="links">
+          <li class="nav-item" id="login">
+            <a class="nav-link active" aria-current="page" href="/Login/login.html">Login</a>
+          </li>
+          <li class="nav-item" id="register">
+            <a class="nav-link active" aria-current="page" href="/Register/register.html">Register</a>
+          </li>
+        </ul>
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+          <li class="nav-item d-none" id="user" style="margin-right:20px ;color:#000;">UserName</li>
+          <li class="nav-item d-none" id="logOut">
+            <button class="btn btn-outline-dark">LogOut</button>
+          </li>
+        </ul>
+        <form class="d-none" id="cart">
+          <button class="btn btn-outline-dark" id="btn_black" type="button">
+            <i class="bi-cart-fill me-1"></i>
+            Cart
+            <span class="badge bg-dark text-white ms-1 rounded-pill" id="count">0</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </nav>
+
+  <header>
+    <div class="container">
+      <h1 class="display-4 fw-bolder">Shop in style</h1>
+      <p class="lead fw-normal">With this shop homepage template</p>
+    </div>
+  </header>
+
+  <section class="py-5">
+    <div class="container px-4 px-lg-5 mt-5">
+      <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 justify-content-center" id="data">
+       
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p class="m-0">Copyright &copy; Your Website 2023</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/test.js"></script>
+  <script>
+    // عند تحميل الصفحة
+    window.onload = function () {
+      let storedCart = localStorage.getItem("cart");
+      if (storedCart) {
+        cartItems = JSON.parse(storedCart);
+        updateCartCount();
+      } else {
+        cartItems = [];
+        updateCartCount();
+      }
+
+      if (localStorage.getItem("userEmail") && localStorage.getItem("userPassword")) {
+        products();
+      }
+    };
+
+    function updateCartCount() {
+      count.textContent = cartItems.length;
+      localStorage.setItem("cartCount", cartItems.length);
+    }
+
+    async function products() {
+      let data = await fetch(`https://fakestoreapi.com/products`);
+      let result = await data.json();
+      display(result);
+    }
+
+    function display(data) {
+
+      let cartona = ``;
+      for (let i = 0; i < data.length; i++) {
+        cartona += `
+          <div class="col mb-5">
+            <div class="card h-100">
+              <img class="card-img-top" src="${data[i].image}" alt="${data[i].description}" />
+              <div class="card-body p-4">
+                <div class="text-center">
+                  <h5 class="fw-bolder">${data[i].title}</h5>
+                  $${data[i].price}
+                </div>
+              </div>
+              <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+                <div class="text-center">
+                  <a class="btn btn-outline-dark mt-auto" id="add_card${i}" href="#">Add to cart</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      document.getElementById("data").innerHTML = cartona;
+
+      for (let i = 0; i < data.length; i++) {
+        let add_card = document.getElementById(`add_card${i}`);
+        add_card.addEventListener("click", function () {
+          cartItems.push(data[i]);
+          localStorage.setItem("cart", JSON.stringify(cartItems));
+          updateCartCount();
+        });
+      }
+    }
+
+
+    var btn_black = document.getElementById("btn_black");
+    btn_black.addEventListener("click", function () {
+      window.open('/Register/cart.html', '_blank');
+    });
+
+    let links = document.getElementById("links");
+    let user = document.getElementById("user");
+    let userName = localStorage.getItem("userName");
+    let cartSection = document.getElementById("cart");
+    let logOut = document.getElementById("logOut");
+
+    if (localStorage.getItem("userName")) {
+      links.remove();
+      user.classList.remove("d-none");
+      user.innerHTML = userName;
+      cartSection.classList.remove("d-none");
+      logOut.classList.remove("d-none");
+    }
+
+    logOut.addEventListener("click", function () {
+      localStorage.clear();
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    });
+  </script>
+</body>
+</html>
